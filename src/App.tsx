@@ -1,10 +1,10 @@
 import './App.css'
-import Watch from './components/Watch/Watch'
+import Form from './components/Form/Form'
 
 export default function App() {
   return (
     <div className='app'>
-      <Watch/>
+      <Form/>
     </div>
   )
 }

@@ -1,64 +1,55 @@
-import { useRef, useState, useEffect } from 'react';
-import { Time } from '../../interfaces/Time';
+import { useState, useEffect } from 'react';
+import { DateTime } from "luxon";
+
+import { ClockProps } from '../../interfaces/ClockProps';
+
 import './clock-style.css';
 
-type ClockProps = {
-  title: string,
-  timeZone: number,
-  times: Time[],
-  setTimes: (prev: Time[]) => void
-}
+export default function Clock(props: ClockProps) {    
+  const { title, timeZone, id } = props.clock;
+  const { removeClock } = props;
+  let zoneToString = '';
 
-const Clock: React.FC<ClockProps> = ({ title, timeZone, times, setTimes }) => {
-  const hourEl = useRef(null);
-  const minEl = useRef(null);
-  const secEl = useRef(null);
-  const [date, setDate] = useState(Date.now());
-  const hour = Math.floor(((date / 1000 / 60 / 60) + timeZone) % 12);
-  const min = Math.floor((date / 1000 / 60 ) % 60);
-  const sec = Math.floor((date / 1000 ) % 60);
-  const secDeg = sec / 60 * 360;
-  const minDeg = min / 60 * 360 + secDeg / 60;
-  const hourDeg = 90 + (hour / 12 * 360) + minDeg / 12;
+  if(timeZone[0] === '-' || timeZone[0] === '+') {
+    zoneToString = 'UTC' + timeZone;
+  } else if(timeZone.length === 0) {
+    zoneToString = 'system';
+  } else {
+    zoneToString = 'UTC+' + timeZone;
+  }
+
+  let [time, setTime] = useState(DateTime.fromObject({}, {zone: zoneToString}));
   
   useEffect(() => {
-    const timeId = setInterval(() => setDate(Date.now()), 1000);
-    return () => clearInterval(timeId);
-  }, []);
+    const timeOut = setTimeout(() => {
+      setTime(time = DateTime.fromObject({}, {zone: zoneToString}))
+    }, 1000);
 
-  const removeClock = () => {
-    setTimes(times.filter(item => item.title !== title))
-  }
+    return () => clearInterval(timeOut);
+  }, [time])
 
   return (
     <div className='clock'>
       <h3 className="clock__title">{title}</h3>
       <button
         className="clock__close"
-        onClick={removeClock}
+        onClick={() => removeClock()} 
+        data-id={id}
       >❌</button>
       <div className="clock__wrapper">
         <div
           className="clock__hour"
-          ref={hourEl}
-          style={{transform: `rotate(${hourDeg}deg)`}}
+          style={{transform: `rotate(${90 + (time.hour / 12 * 360) + time.minute / 12}deg)`}}
         ></div>
         <div
           className="clock__minute"
-          ref={minEl}
-          style={{transform: `rotate(${minDeg}deg)`}}
+          style={{transform: `rotate(${time.minute / 60 * 360 + time.second / 60}deg)`}}
         ></div>
         <div
           className="clock__second"
-          ref={secEl}
-          style={{transform: `rotate(${secDeg}deg)`}}
+          style={{transform: `rotate(${time.second / 60 * 360}deg)`}}
         ></div>
-      </div>
-      <div className="clock__num">
-        {`${hour} : ${min} : ${sec}`}
       </div>
     </div>
   )
 }
-
-export default Clock

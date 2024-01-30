@@ -20,3 +20,17 @@
 .watch__item {
   text-align: left;
 }
+
+.input-row {
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  gap: 20px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
