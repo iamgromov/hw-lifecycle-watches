@@ -21,8 +21,9 @@ export default function Form() {
         setTitle(title = '');
         setTimeZone(timeZone = '');
     }
-
+    
     const removeClock = () => {
+        // @ts-ignore
         const clockId= event?.target?.getAttribute('data-id');
         const newClcocks = clocks.filter(el => el.id !== clockId);
         setClocks(clocks = [...newClcocks]);
